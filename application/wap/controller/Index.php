@@ -22,8 +22,10 @@ use data\service\GoodsCategory;
 use data\service\Member as MemberService;
 use data\service\NfxCommissionCalculate;
 use data\service\NfxCommissionConfig;
+use data\service\NfxPromoter;
 use data\service\Platform;
 use data\service\promotion\PromoteRewardRule;
+use data\service\User;
 use data\service\WebSite;
 use think\Cookie;
 use data\service\Promotion;
@@ -428,5 +430,27 @@ class Index extends BaseController
 //        exit();
 //        $res = $commissionCalculate->getPartnerParents(11);
         dump($commissionCalculate);
+    }
+
+    public function userIsParent()
+    {
+        $nfx_promoter = new NfxPromoter();
+        $info = $nfx_promoter->getPromoterInfo($this->uid);
+        return AjaxReturn(1,$info);
+    }
+
+    public function bindParent()
+    {
+        $nfx_promoter = new NfxPromoter();
+        $user_service = new User();
+        $parent_mobile = $this->request->post('parent_mobile','');
+        if(empty($parent_mobile)) return AjaxReturn(-1,'手机号不能为空');
+        $parent_info = $user_service->getUserInfoByMobile($parent_mobile);
+        $parent_promoter_info= $nfx_promoter->getPromoterInfo($parent_info['uid']);
+        if(empty($parent_info)) return AjaxReturn(-1,'推荐人不存在');
+        if(empty($parent_promoter_info)) return AjaxReturn(-1,'推荐人不存在');
+        $self_info = $nfx_promoter->getPromoterInfo($this->uid);
+        $res = $nfx_promoter->modifyPromoterParent($self_info['promoter_id'],$parent_promoter_info['promoter_no'],0,0);
+        return AjaxReturn($res);
     }
 }

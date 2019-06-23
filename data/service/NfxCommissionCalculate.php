@@ -198,7 +198,7 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
     /* (non-PHPdoc)
      * @see \data\api\INfxCommissionCalculate::orderdistributionCommission()
      */
-    public function orderdistributionCommission()
+    public function orderdistributionCommissions()
     {
         if ($this->is_distribution_enable == 1) {
             $commossion_distribution = new NfxCommissionDistributionModel();
@@ -241,6 +241,82 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
                                         $this->commission_rate += $promoter_level_info['level_2'];
                                     }
                                 }
+
+                            }
+
+
+                        }
+                    }
+                }
+                $commossion_distribution->commit();
+                return 1;
+            } catch (\Exception $e) {
+                $commossion_distribution->rollback();
+                return $e->getMessage();
+            }
+        } else {
+            return 1;
+        }
+
+
+    }
+
+
+    /* (non-PHPdoc)
+     * @see \data\api\INfxCommissionCalculate::orderdistributionCommission()
+     */
+    public function orderdistributionCommission()
+    {
+        if ($this->is_distribution_enable == 1) {
+            $commossion_distribution = new NfxCommissionDistributionModel();
+            if (empty($this->order_info)) {
+                return 1;
+            }
+
+            $commossion_distribution->startTrans();
+            try {
+                foreach ($this->order_info['order_goods_list'] as $k => $order_goods) {
+                    if (empty($order_goods['commission_rate'])) {
+                        continue;
+                    }
+
+                    //获取佣金信息
+                    $commission_rate = $order_goods['commission_rate'];
+                    if (!empty($commission_rate)) {
+                        if ($commission_rate['is_open'])    //启动分销
+                        {
+                            //查询对应推广员
+                            $promoter_id = $this->promoter_id;
+                            // Log::write('promoter_id！'.$promoter_id);
+
+                            if ($promoter_id != 0) {
+                                $nfx_promoter_service = new NfxPromoter();
+                                $promoter_model = new NfxPromoterModel();
+                                $promoter_info = $promoter_model->getInfo(['promoter_id' => $promoter_id], 'parent_promoter,promoter_level,uid');
+                                $commission_count = $this->isOnePromoterCommission($promoter_info['uid']);
+                                if($commission_count > 0){
+                                    $parent_arr = $nfx_promoter_service->getPromoterParentPointQuery($promoter_id,0);
+                                }else{
+                                    $parent_arr = $nfx_promoter_service->getPromoterParentQuery($promoter_id,0);
+                                }
+                                $promoter_level = $promoter_info['promoter_level'];
+                                $promoter_level_model = new NfxPromoterLevelModel();
+                                $promoter_level_info = $promoter_level_model->get($promoter_level);
+                                $goods_return = $order_goods['goods_return'];
+                                //拨出总金额
+                                $commission_money = (float)sprintf("%.2f",$goods_return * ($promoter_level_info['level_rate'] / 100));
+
+                                foreach ($parent_arr as $k=>$v){
+                                    if(empty($v)){
+                                        continue;
+                                    }
+                                    if($commission_money <=0 ) continue;
+                                    $parent_promoter_info = $promoter_model->getInfo(['promoter_id' => $v], 'parent_promoter,promoter_level');
+                                    if(empty($parent_promoter_info)) continue;
+                                    $retval = $this->addOrderDistributionCommission($this->shop_id, $v, $this->order_info['order_id'], $order_goods['order_goods_id'], $order_goods['real_pay'], $order_goods['cost_price'], $goods_return, $k+1, $this->distribution_commission_rate, $promoter_level_info['level_rate'],$commission_money);
+                                    $commission_money =  (float)sprintf("%.2f",$commission_money * ($promoter_level_info['level_rate'] / 100));
+                                }
+
 
                             }
 
@@ -845,6 +921,23 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
             $parents_array[] = $promoter_info;
         }
         return $parents_id;
+    }
+
+    /**
+     * 是否是第一次分销佣金
+     */
+    public function isOnePromoterCommission($promoter_uid)
+    {
+        $order_model = new NsOrderModel();
+        $commission_distribution_model = new NfxCommissionDistributionModel();
+        $order_id_list = $order_model->getQuery(['buyer_id'=>$promoter_uid],'order_id','');
+        $order_id_arr = [];
+        foreach ($order_id_list as $k=>$v){
+            $order_id_arr[] = $v['order_id'];
+        }
+        $order_id_str = implode(',',$order_id_arr);
+        $commission_count = $commission_distribution_model->getCount(['order_id'=>['in',$order_id_str]]);
+        return $commission_count;
     }
 
 }

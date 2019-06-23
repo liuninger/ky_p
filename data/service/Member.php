@@ -171,6 +171,17 @@ public function registerMember($user_name, $password, $email, $mobile, $user_qq_
      */
     public function addMember($user_name, $password, $email, $sex, $status, $mobile, $member_level)
     {
+        if(!empty($user_name)){
+            $user_name_info = $this->getUserInfoByUsername($user_name);
+            if(!empty($user_name_info)){
+                return $user_name_info['uid'];
+            }
+        }elseif(!empty($mobile)){
+            $user_mobile_info = $this->getUserInfoByMobile($mobile);
+            if(!empty($user_mobile_info)){
+                return $user_mobile_info['uid'];
+            }
+        }
         $res = parent::add($user_name, $password, $email, $mobile, 0, '', '', '', '', '', 1);
         if ($res > 0) {
             $member = new NsMemberModel();

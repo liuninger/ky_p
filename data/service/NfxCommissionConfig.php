@@ -307,7 +307,12 @@ class NfxCommissionConfig extends BaseService implements INfxCommissionConfig
         foreach ($promoter_list as $k=>$v){
             $promoter_sum_arr[] = $v['level_0'] + $v['level_1'] + $v['level_2'];
         }
-        $promoter_max_rate = max($promoter_sum_arr);
+        if(count($promoter_sum_arr)>0){
+            $promoter_max_rate = max($promoter_sum_arr);
+        } else{
+            $promoter_max_rate = 0;
+        }
+
         $partner_sum_rate = $nfx_partner_level->getSum([],'commission_rate');
         $agent_info = $nfx_shop_region_agent_config->getinfo(['id'=>1],'province_rate,city_rate,district_rate');
         $agent_sum_rate = 0;
@@ -337,7 +342,11 @@ class NfxCommissionConfig extends BaseService implements INfxCommissionConfig
         foreach ($promoter_list as $k=>$v){
             $promoter_sum_arr[] = $v['level_0'] + $v['level_1'] + $v['level_2'];
         }
-        $promoter_max_rate = max($promoter_sum_arr);
+        if(count($promoter_sum_arr)>0){
+            $promoter_max_rate = max($promoter_sum_arr);
+        } else{
+            $promoter_max_rate = 0;
+        }
         $partner_sum_rate = $nfx_partner_level->getSum([],'commission_rate');
         $agent_info = $nfx_shop_region_agent_config->getinfo(['id'=>1],'province_rate,city_rate,district_rate');
         $agent_sum_rate = 0;

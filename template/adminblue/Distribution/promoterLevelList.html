@@ -2,7 +2,7 @@
 {block name="resources"/}{/block}
 {block name="right_tab"}{/block}
 {block name="main"}
-<div class="options-btn">
+<div class="options-btn" >
 	<button class="btn-common btn-small" onclick="location.href='{:__URL('ADMIN_MAIN/distribution/addpromoterlevel')}';">添加</button>
 </div>
 <div class="mod-table">
@@ -13,8 +13,9 @@
 					<col style="width: 5%;">
 					<col style="width: 10%;">
 					<col style="width: 10%;">
-					<col style="width: 15%;">
-					<col style="width: 15%;">
+					<!--<col style="width: 15%;">-->
+					<!--<col style="width: 15%;">-->
+					<!--<col style="width: 15%;">-->
 					<col style="width: 15%;">
 					<col style="width: 15%;">
 					<col style="width: 15%;">
@@ -24,10 +25,11 @@
 						<th><label style="margin-left: 5px;"> <input type="checkbox"  onclick="CheckAll(this)"></label></th>
 						<th>等级名称</th>
 						<th>升级条件</th>
-						<th>店内销售佣金比率</th>
-						<th>给上级的佣金比率</th>
-						<th>给上上级的佣金比率</th>
-						<th>创建时间</th>						
+						<!--<th>店内销售佣金比率</th>-->
+						<!--<th>给上级的佣金比率</th>-->
+						<!--<th>给上上级的佣金比率</th>-->
+						<th>佣金比率</th>
+						<th>创建时间</th>
 						<th>操作</th>
 					</tr>
 				</thead>
@@ -69,11 +71,13 @@
 						html += '<td><div class="cell"><label ><input name="sub" type="checkbox" value="'+ data["data"][i]["level_id"] +'" ></label></div></td>';
 						html += '<td>' + data["data"][i]["level_name"] + '</td>';
 						html += '<td>' + data["data"][i]["level_money"] + '元</td>';
-						html += '<td>' + data["data"][i]["level_0"] + '</td>';
-						html += '<td>' + data["data"][i]["level_1"] + '</td>';
-						html += '<td>' + data["data"][i]["level_2"] + '</td>';
+						// html += '<td>' + data["data"][i]["level_0"] + '</td>';
+						// html += '<td>' + data["data"][i]["level_1"] + '</td>';
+						// html += '<td>' + data["data"][i]["level_2"] + '</td>';
+						html += '<td>' + data["data"][i]["level_rate"] + '</td>';
 						html += '<td>' + timeStampTurnTime(data["data"][i]["create_time"]) + '</td>';
-						html += '<td><a href="'+__URL('ADMIN_MAIN/distribution/updatepromoterlevel?level_id='+ data["data"][i]["level_id"])+'">修改</a>&nbsp;&nbsp;<a href="javascript:void(0);" onclick="deleteBox('+ data["data"][i]["level_id"] +');">删除</a></td> ';
+						html += '<td><a href="'+__URL('ADMIN_MAIN/distribution/updatepromoterlevel?level_id='+ data["data"][i]["level_id"])+'">修改</a> ';
+                    // &nbsp;&nbsp;<a href="javascript:void(0);" onclick="deleteBox('+ data["data"][i]["level_id"] +');">删除</a></td>
 						html += '</tr>';
 					}
 				} else {

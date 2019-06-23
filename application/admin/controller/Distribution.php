@@ -239,7 +239,9 @@ class Distribution extends BaseController
             $level_1 = request()->post("level_1", 0);
             $level_2 = request()->post("level_2", 0);
             $nfx_config = new NfxCommissionConfig();
-            $rate = $level_0 + $level_1 + $level_2;
+            $level_rate = request()->post("level_rate", 0);
+            $rate = $level_rate;
+//            $rate = $level_0 + $level_1 + $level_2;
             $is_res = $nfx_config->getCommissionIsMax($rate,'add','promoter');
             if ($is_res['code'] == -1) {
                 return $is_res;
@@ -250,7 +252,7 @@ class Distribution extends BaseController
 //             $level_1 = $_POST["level_1"];
 //             $level_2 = $_POST["level_2"];
             $promoter = new NfxPromoterService();
-            $res = $promoter->addPromoterLevel($shop_id, $level_name, $level_money, $level_0, $level_1, $level_2);
+            $res = $promoter->addPromoterLevel($shop_id, $level_name, $level_money, $level_0, $level_1, $level_2,$level_rate);
             return AjaxReturn($res);
         } else {
             return view($this->style . "Distribution/addPromoterLevel");

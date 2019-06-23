@@ -19,25 +19,32 @@
 			<p class="error">请输入升级条件</p>
 		</dd>
 	</dl>
-	<dl>
+	<dl style="display: none;">
 		<dt>本店销售佣金比率:</dt>
 		<dd>
 			<p><input name="" id="level_0" type="text" value="{$premoter_level_info.level_0}" onkeyup="javascript:CheckInputIntFloat(this);"/>&nbsp;%</p>	
 			<p class="error">请输入本店销售佣金比率</p>
 		</dd>
 	</dl>
-	<dl>
+	<dl  style="display: none;">
 		<dt>给上级的佣金比率:</dt>
 		<dd>
 			<p><input name="" id="level_1" type="text" value="{$premoter_level_info.level_1}" onkeyup="javascript:CheckInputIntFloat(this);"/>&nbsp;%</p>	
 			<p class="error">请输入给上级的佣金比率</p>
 		</dd>
 	</dl>
-	<dl>
+	<dl  style="display: none;">
 		<dt>给上上级的佣金比率:</dt>
 		<dd>
 			<p><input name="" id="level_2" type="text" value="{$premoter_level_info.level_2}" onkeyup="javascript:CheckInputIntFloat(this);"/>&nbsp;%</p>	
 			<p class="error">请输入给上上级的佣金比率</p>
+		</dd>
+	</dl>
+	<dl>
+		<dt>佣金比率:</dt>
+		<dd>
+			<p><input name="" id="level_rate" type="text" value="{$premoter_level_info.level_rate}" class="input-common harf" onkeyup="javascript:CheckInputIntFloat(this);"/><em class="unit">%</em></p>
+			<p class="error">请输入给上级的佣金比率</p>
 		</dd>
 	</dl>
 	<dl>
@@ -55,6 +62,7 @@
 		var level_0 = $("#level_0").val();
 		var level_1 = $("#level_1").val();
 		var level_2 = $("#level_2").val();
+        var level_rate = $("#level_rate").val();
 		//var level_id = $("#level_id").val();
 		if(level_name == ""){
 			$("#level_name").parent().next().show();
@@ -62,10 +70,14 @@
 		}else{
 			$("#level_name").parent().next().hide();
 		}
-		if((parseFloat(level_0) +parseFloat(level_1)+ parseFloat(level_2))>100 ){
-			showMessage('error', "佣金比率不可超过100%！");	
-			return false;
-		}
+		// if((parseFloat(level_0) +parseFloat(level_1)+ parseFloat(level_2))>100 ){
+		// 	showMessage('error', "佣金比率不可超过100%！");
+		// 	return false;
+		// }
+        if(parseFloat(level_rate)>100 ){
+            showMessage('error', "佣金比率不可超过100%！");
+            return false;
+        }
 		$.ajax({
 			type:"post",
 			url:"{:__URL('ADMIN_MAIN/distribution/updatepromoterlevel')}",
@@ -75,6 +87,7 @@
 				'level_0':level_0,
 				'level_1':level_1,
 				'level_2':level_2,
+				'level_rate' :level_rate,
 				'level_id':{$level_id}
 			},
 			async:true,

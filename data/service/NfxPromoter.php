@@ -300,7 +300,7 @@ class NfxPromoter extends BaseService implements INfxPromoter
      * (non-PHPdoc)
      * @see \data\api\IPromoter::addPromoterLevel()
      */
-    public function addPromoterLevel($shop_id, $level_name, $level_money, $level_0, $level_1, $level_2)
+    public function addPromoterLevel($shop_id, $level_name, $level_money, $level_0, $level_1, $level_2,$level_rate)
     {
         $promoter_level = new NfxPromoterLevelModel();
         $data = array(
@@ -310,6 +310,7 @@ class NfxPromoter extends BaseService implements INfxPromoter
             "level_0" => $level_0,
             "level_1" => $level_1,
             "level_2" => $level_2,
+            "level_rate" => $level_rate,
             "create_time" => time()
         );
         $promoter_level->save($data);
@@ -321,7 +322,7 @@ class NfxPromoter extends BaseService implements INfxPromoter
      * (non-PHPdoc)
      * @see \data\api\IPromoter::updatePromoterLevel()
      */
-    public function updatePromoterLevel($level_id, $level_name, $level_money, $level_0, $level_1, $level_2)
+    public function updatePromoterLevel($level_id, $level_name, $level_money, $level_0, $level_1, $level_2,$level_rate)
     {
         $promoter_level = new NfxPromoterLevelModel();
         $data = array(
@@ -330,6 +331,7 @@ class NfxPromoter extends BaseService implements INfxPromoter
             "level_0" => $level_0,
             "level_1" => $level_1,
             "level_2" => $level_2,
+            "level_rate" => $level_rate,
             "modify_time" => time()
         );
         $retval = $promoter_level->save($data, [
@@ -614,7 +616,7 @@ class NfxPromoter extends BaseService implements INfxPromoter
      * 查询推广员的上级
      * 返回上级推广云uid 以，隔开
      */
-    private function getPromoterParentQuery($promoter_id, $shop_id)
+    public function getPromoterParentQuery($promoter_id, $shop_id)
     {
         $is_go = 0;
         $parent_array = array();
@@ -634,6 +636,42 @@ class NfxPromoter extends BaseService implements INfxPromoter
         }
         return $parent_array;
     }
+
+    /**
+     * 查询推广员的上级
+     * 返回上级推广云uid 以，隔开
+     */
+    public function getPromoterParentPointQuery($promoter_id, $shop_id)
+    {
+        $is_go = 0;
+        $parent_array = array();
+        $promoter = new NfxPromoterModel();
+
+        while ($is_go == 0) {
+            $promoter_info = $promoter->getInfo(array(
+                "shop_id" => $shop_id,
+                "promoter_id" => $promoter_id,
+                "is_audit" => 1
+            ));
+            if (!empty($promoter_info)) {
+                $promoter_id = $promoter_info["parent_promoter"];
+                $parent_array[] = $promoter_info["parent_promoter"];
+            } else {
+                $is_go = 1;
+            }
+        }
+        $parent_point_array = [];
+        foreach ($parent_array as $k=>$v){
+            $promoter_info = $promoter->getInfo([
+                'promoter_id' => $v
+            ],'*');
+            if($promoter_info['promoter_level'] > 1){
+                $parent_point_array[] = $v;
+            }
+        }
+        return $parent_point_array;
+    }
+
 
 
     /*

@@ -241,6 +241,9 @@ i.shipping_fee{font-style: normal;font-size: 12px!important;;background: #fff;co
 	</div>
 	{include file="wap/default_new/controlCopyRight" /}
 </div>
+<div class="parent-block" style="display: none;">
+	<span>推荐人手机号：</span> <input type="number" id="parent_mobile" value="" placeholder="请输入推荐人手机号" onkeyup="setParentMobile(this)">
+</div>
 {/block}
 {block name="javascript"}
 <script>
@@ -264,8 +267,56 @@ $(function(){
 		success : function(data){
 			{include file='wap/default_new/shareContents'/}
 		}
-	})
-})
+	});
+
+	var parent_mobile = '';
+    setParentMobile = function(_this){
+        parent_mobile = $(_this).val();
+	};
+    $.ajax({
+        type:"post",
+        url : "{:__URL('APP_MAIN/index/userIsParent')}",
+        data : {},
+        success : function(data){
+            if(parseInt(data.data.parent_promoter) <= 0){
+                $(".motify").css('z-index','99999999')
+                layer.confirm($(".parent-block").html(), {icon: 3, title:'绑定推荐人'}, function(index){
+					var mobile = parent_mobile
+					console.log(mobile);
+					if(mobile.length <= 0){
+                        $("#parent_mobile").trigger("focus");
+                        showBox("推荐人手机号不能为空！","warning");
+                        return false;
+					}
+                    if(mobile.search(/^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/) == -1){
+                        $("#parent_mobile").trigger("focus");
+                        showBox("请输入正确的手机号！","warning");
+                        return false;
+                    }
+                    $.ajax({
+                        type:"post",
+                        url : "{:__URL('APP_MAIN/index/bindParent')}",
+                        data : {"parent_mobile" : mobile },
+                        success : function(data){
+                            if(data.code > 0){
+                                showBox('绑定成功',"success");
+                                layer.close(index);
+							}else{
+                                showBox(data.data,"warning");
+                                return false;
+							}
+                        }
+                    });
+                },function(index){
+                    showBox('请绑定推荐人手机号！');
+                    return false;
+				});
+			}
+        }
+    });
+
+
+});
 //跳转到电脑端
 function locationShop(){
 	$.ajax({
@@ -279,5 +330,7 @@ function locationShop(){
 		}
 	})
 }
+
+
 </script>
 {/block}

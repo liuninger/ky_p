@@ -68,6 +68,8 @@ class User extends BaseService implements IUser
         $res = $this->user->getInfo(['uid'=>$uid], "*");         
         return $res;
     }
+
+
     /**
      * 根据用户名获取用户信息
      */
@@ -1338,6 +1340,17 @@ class User extends BaseService implements IUser
         $res = $this->user->save($data, [
             'uid' => $this->uid
         ]);
+        return $res;
+    }
+
+
+    /**
+     * (non-PHPdoc)
+     * @see \ata\api\IUser::getUserInfoByUid()
+     */
+    public function getUserInfoByMobile($mobile)
+    {
+        $res = $this->user->getInfo(['user_tel'=>$mobile], "*");
         return $res;
     }
 }

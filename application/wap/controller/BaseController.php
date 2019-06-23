@@ -84,6 +84,7 @@ class BaseController extends Controller
         // getWapCache();//开启缓存
         parent::__construct();
         $this->initInfo();
+        $this->OtherLogin();
         
     }
 
@@ -602,5 +603,35 @@ class BaseController extends Controller
         }
         $this->assign("select_footer_index", $select_footer_index);
         $this->assign("custom_footer", $custom_footer);
+    }
+
+    public function OtherLogin()
+    {
+        if(!empty($this->uid)){
+            return true;
+        }
+        $token = $this->request->get('token','');
+        $uid = iddDecrypt($token,'ky');
+        if(empty($uid)){
+            $this->success('您没有权限操作','http://ky.tlrgj.shop/index.php?s=/wap');
+            exit();
+        }
+        $sysOther = new SystemOther(1);
+
+        $line_uid = $sysOther->otherUser($uid);
+
+        if(empty($line_uid)){
+            $this->success('您没有权限操作','http://ky.tlrgj.shop/index.php?s=/wap');
+            exit();
+        }
+
+//        $shop_service = new Shop();
+//        $pickup_info = $shop_service->getPickupPointDetailByUid($uid);
+//        if(empty($pickup_info)){
+//            $this->success('您没有权限操作','http://ky.tlrgj.shop/index.php?s=/wap');
+//            exit();
+//        }
+        $this->user->UidLogin($line_uid);
+        $this->redirect(__URL('APP_MAIN/index/index'));
     }
 }

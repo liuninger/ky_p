@@ -57,11 +57,11 @@ interface INfxPromoter
     /**
      * 推广员等级添加
      */
-    function addPromoterLevel($shop_id, $level_name, $level_money, $level_0, $level_1, $level_2);
+    function addPromoterLevel($shop_id, $level_name, $level_money, $level_0, $level_1, $level_2,$level_rate);
     /**
      * 推广员等级修改
      */
-    function updatePromoterLevel($level_id, $level_name, $level_money, $level_0, $level_1, $level_2);
+    function updatePromoterLevel($level_id, $level_name, $level_money, $level_0, $level_1, $level_2,$level_rate);
     /**
      * 获取推广员详细信息
      * @param unknown $promoter_id

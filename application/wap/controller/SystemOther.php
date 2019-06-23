@@ -49,8 +49,8 @@ class SystemOther extends Controller
     {
         $config_service = new Config();
 
-//        $this->other_host =  'http://ky.tlrgj.shop/index.php?s=/wap/SystemOther/';
-        $this->other_host =  'http://127.0.0.1/ky/index.php?s=/wap/SystemOther/';
+        $this->other_host =  'http://ky.tlrgj.shop/index.php?s=/wap/SystemOther/';
+//        $this->other_host =  'http://127.0.0.1/ky/index.php?s=/wap/SystemOther/';
         $this->data = [
             'source_secret_key' => $this->secret_key
         ];

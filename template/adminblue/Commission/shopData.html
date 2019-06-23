@@ -1,0 +1,128 @@
+{extend name="adminblue/base" /}
+{block name="resources"/}
+<link rel="stylesheet" type="text/css" href="ADMIN_CSS/defau.css">
+<script type="text/javascript" src="__STATIC__/My97DatePicker/WdatePicker.js"></script>
+<style>
+    .top{margin-top:10px;width:500px;border:1px solid #CCC;margin-left:18px}
+    .top laber{font-size:12px}
+    .top dl button{cursor:pointer;margin-left:65px;margin-top:37px;width:320px;height:30px;background-color:#146e3c;color:#fff;border-width:2px;border:none}
+    .table{width:99%;table-layout:fixed;empty-cells:show;border-collapse:collapse;border:1px solid #d8d8d8}
+    .table th{line-height:25px;text-align:center;border:1px solid #d8d8d8}
+    .WSY_table_header{background-color:#146e3c}
+    .table tr{font-size:12px;color:#323232;font-family:Helvetica,"Microsoft YaHei",Arial,Helvetica,sans-serif}
+    .table td{border:1px solid #d8d8d8;padding:0 1em 0;text-overflow:ellipsis;overflow:hidden;line-height:40px;text-align:center!important}
+    .top dl{padding:20px;width:auto}
+    .date-style{width:100%;display:inline-block;margin-top: 20px;}
+    .date-style span{height:20px;line-height:20px}
+    .put-top{text-align:center}
+    .money-box{width:500px;border:1px solid #E6E6E6;margin-left:18px;text-align:center}
+    .money-box div{margin:20px auto;width:300px}
+    .money-box div span{height:20px;line-height:20px;margin-bottom:10px}
+    .money-box button{padding:4px 10px;width:100px;margin-bottom:20px}
+    #global_money{height:20px;padding:4px}
+</style>
+{/block}
+{block name="main"}
+<div class="set-style">
+
+    <input type="hidden" id="last_time"value="{$default_time[1]}"/>
+    <div style="height:300px;border:1px solid #EBEBEB;margin-bottom:10px;">
+        <div style="float:left;width:100%;text-align:center;">
+            <h1 style="color:#939694;padding-top:15px;" id="total_amount">0.00</h1>
+            <h5 style="color:#939694;">订单总金额</h5>
+            <h1 style="color:#939694;padding-top:15px;" id="appropriate">0.00</h1>
+            <h5 style="color:#939694;">订单实际拨出 <span id="rate"></span></h5>
+            <h1 style="color:#939694;padding-top:15px;" id="actual_money">0.00</h1>
+            <h5 style="color:#939694;">商城实际收益</h5>
+            <div  class="date-style" >
+                <input class="input-common"style="width: 35%;" type="text" value="{$default_time[0]}" id="start_time"  placeholder="请选择开始时间" onclick="WdatePicker()" />&nbsp;&nbsp;-&nbsp;&nbsp;<input placeholder="请选择结束时间" onclick="WdatePicker()"style="width:35%;" type="text" value="{$default_time[1]}" id="end_time"class="input-common"/>
+            </div>
+            <div style="margin:10px  auto;width:80%;margin-top:10px;line-height:30px;text-align:center;border:1px solid #00C0FF;"onclick="settlementAmount();">
+                <span style="color:#00C0FF;font-size:12px;" >查询</span>
+            </div>
+        </div>
+    </div>
+    <table class="table-class">
+        <thead>
+        <tr>
+            <th>佣金等级</th>
+            <th>人数</th>
+            <th>佣金</th>
+        </tr>
+        </thead>
+
+        <tbody>
+
+            <tr align="center">
+                <td><span>推广员</span></td>
+                <td><span id="ncd_count">0</span></td>
+                <td><span id="ncd_sum">0.00</span></td>
+            </tr>
+            <tr align="center">
+                <td><span>区域代理</span></td>
+                <td><span id="nca_count">0</span></td>
+                <td><span id="nca_sum">0.00</span></td>
+            </tr>
+            <tr align="center">
+                <td><span>股东分红</span></td>
+                <td><span id="ncp_count">0</span></td>
+                <td><span id="ncp_sum">0.00</span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{include file="adminblue/openDialog" /}
+<script src="__STATIC__/js/limit_input_digit.js"></script>
+<script>
+    $(function(){
+        settlementAmount();
+    });
+    //查询一顿时间内可发放佣金
+    function settlementAmount(){
+        var start_time = $("#start_time").val();
+        var end_time = $("#end_time").val();
+        var last_time= $("#last_time").val();
+        var start_date=new Date(start_time.replace("-", "/").replace("-", "/"));
+        var end_date=new Date(end_time.replace("-", "/").replace("-", "/"));
+        var today = new Date("{$end_time}".replace("-", "/").replace("-", "/"));
+        if(last_time != ""){
+            var last_date = new Date(last_time.replace("-", "/").replace("-", "/"));
+            if(start_date > last_date){
+                showMessage('error', "开始时间不可小于结束时间！");
+                return false;
+            }
+        }
+        if(end_date > today){
+            showMessage('error', "结束时间不可超过今天！");
+            return false;
+        }
+        $.ajax({
+            type:"post",
+            url:"{:__URL('ADMIN_MAIN/commission/shopData')}",
+            data:{
+                'start_time':start_time,
+                'end_time':end_time
+            },
+            async:true,
+            success:function (data) {
+                console.log(data)
+                $("#total_amount").html(data.order_data.sum);
+                $("#appropriate").html(data.appropriate);
+                $("#rate").html('（' + data.appropriate_rate +  '%）');
+
+                $("#nca_count").html(data.nca_data['count']);
+                $("#nca_sum").html(data.nca_data['sum']);
+
+                $("#ncd_count").html(data.ncd_data['count']);
+                $("#ncd_sum").html(data.ncd_data['sum']);
+
+                $("#ncp_count").html(data.ncp_data['count']);
+                $("#ncp_sum").html(data.ncp_data['sum']);
+
+                $('#actual_money').html(data.actual_money);
+            }
+        });
+    }
+
+</script>
+{/block}

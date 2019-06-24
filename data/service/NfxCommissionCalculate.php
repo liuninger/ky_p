@@ -70,10 +70,14 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
      */
     public function __construct($order_id = 0, $order_goods_ids = null)
     {
+
         $this->order_info = $this->getOrderInfo($order_id, $order_goods_ids);
+
         $this->shop_id = 0;
         $this->getShopConfig();
+
         $this->getPromoter();
+
     }
 
     /**
@@ -312,7 +316,6 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
                                 $goods_return = $order_goods['goods_return'];
                                 //拨出总金额
                                 $commission_money = (float)sprintf("%.2f",$goods_return * ($promoter_level_info['level_rate'] / 100));
-
                                 foreach ($parent_arr as $k=>$v){
                                     if(empty($v)){
                                         continue;
@@ -322,7 +325,7 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
                                     if(empty($parent_promoter_info)) continue;
                                     $rate = $k == 0 ? $promoter_level_info['level_rate'] : $promoter_level_info['parent_rate'];
                                     $retval = $this->addOrderDistributionCommission($this->shop_id, $v, $this->order_info['order_id'], $order_goods['order_goods_id'], $order_goods['real_pay'], $order_goods['cost_price'], $goods_return, $k+1, $this->distribution_commission_rate, $rate,$commission_money);
-                                    $commission_money =  (float)sprintf("%.2f",$commission_money * $promoter_level_info['parent_rate']);
+                                    $commission_money =  (float)sprintf("%.2f",$commission_money * $promoter_level_info['parent_rate'] /100 );
                                 }
 
 

@@ -607,7 +607,6 @@ class BaseController extends Controller
 
     public function OtherLogin()
     {
-        return;
         if(!empty($this->uid)){
             return true;
         }

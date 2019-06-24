@@ -301,11 +301,12 @@ class NfxCommissionConfig extends BaseService implements INfxCommissionConfig
         $nfx_promoter_level = new NfxPromoterLevelModel();
         $nfx_partner_level = new NfxPartnerLevelModel();
         $nfx_shop_region_agent_config = new NfxShopRegionAgentConfigModel();
-        $promoter_list = $nfx_promoter_level->getQuery([],'level_id,level_0,level_1,level_2','');
+        $promoter_list = $nfx_promoter_level->getQuery([],'level_id,level_0,level_1,level_2,level_rate','');
 
         $promoter_sum_arr = [];
         foreach ($promoter_list as $k=>$v){
-            $promoter_sum_arr[] = $v['level_0'] + $v['level_1'] + $v['level_2'];
+//            $promoter_sum_arr[] = $v['level_0'] + $v['level_1'] + $v['level_2'];
+            $promoter_sum_arr[] = $v['level_rate'];
         }
         if(count($promoter_sum_arr)>0){
             $promoter_max_rate = max($promoter_sum_arr);

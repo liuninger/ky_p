@@ -16,6 +16,7 @@
 namespace app\admin\controller;
 
 use data\service\Goods as GoodsService;
+use data\service\NfxCommissionCalculate;
 use data\service\Order as OrderService;
 use data\service\User as User;
 use data\service\Weixin;
@@ -474,5 +475,11 @@ class Index extends BaseController
         $value = request()->post("value", "show");
         $res = cookie("warm_promt_is_show", $value, 60 * 60 * 24 * 7);
         return $this->getWarmPromptIsShow();
+    }
+
+    public function beta()
+    {
+        $nfx = new NfxCommissionCalculate(3);
+        $nfx->orderdistributionCommission();
     }
 }

@@ -1768,6 +1768,18 @@ function PackageProductInfo() {
 		}
 	})
 	productViewObj.member_discount_arr = JSON.stringify(member_discount_arr);
+    // 会员折扣
+    var member_money_arr = new Array();
+    $("input[name='member_money']").each(function(){
+        var money = parseInt($(this).val());
+        if(money != NaN && money > 0){
+            var member_money = new Object();
+            member_money.level_id = $(this).attr("data-level-id");
+            member_money.money = money;
+            member_money_arr.push(member_money);
+        }
+    });
+    productViewObj.member_money_arr = JSON.stringify(member_money_arr);
 	var decimal_reservation_number = $("input[name='decimal-reservation-number']:checked").val();
 	productViewObj.decimal_reservation_number = decimal_reservation_number == undefined ? -1 : decimal_reservation_number;
 	return productViewObj;

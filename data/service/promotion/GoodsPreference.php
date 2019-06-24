@@ -631,10 +631,16 @@ class GoodsPreference extends BaseService
         
         $member_level_discount = 1; //会员享受折扣率
   
-        $goods_member_discount = $this->getGoodsMemberDiscount($uid, $sku_info["goods_id"]);
+//        $goods_member_discount = $this->getGoodsMemberDiscount($uid, $sku_info["goods_id"]);
+        $goods_member_discount_money = $this->getGoodsMemberDiscountMoney($uid, $sku_info["goods_id"]);
         // 判断商品是否有设置会员折扣率 如果没有则使用店铺设置会员折扣率
-        if(!empty($goods_member_discount)){
-            $member_level_discount = $goods_member_discount;
+//        if(!empty($goods_member_discount)){
+//            $member_level_discount = $goods_member_discount;
+//        }else{
+//            $member_level_discount = $this->getMemberLevelDiscount($uid);
+//        }
+        if(!empty($goods_member_discount_money)){
+            return $goods_member_discount_money;
         }else{
             $member_level_discount = $this->getMemberLevelDiscount($uid);
         }
@@ -720,6 +726,25 @@ class GoodsPreference extends BaseService
         $goods_member_discount_detail = $ns_goods_member_discount -> getInfo(["level_id"=>$member_info["member_level"], "goods_id"=>$goods_id], "discount");
         if(!empty($goods_member_discount_detail["discount"])){
             return $member_level_discount = $goods_member_discount_detail["discount"] / 100;
+        }else{
+            return 0;
+        }
+    }
+
+    /**
+     * 获取商品会员折扣率
+     */
+    public function getGoodsMemberDiscountMoney($uid, $goods_id){
+        // 查询会员等级
+        $member = new NsMemberModel();
+        $member_info = $member->getInfo([
+            'uid' => $uid
+        ], 'member_level');
+        $ns_goods_member_discount = new NsGoodsMemberDiscountModel();
+        $goods_member_discount_detail = $ns_goods_member_discount -> getInfo(["level_id"=>$member_info["member_level"], "goods_id"=>$goods_id], "discount,money");
+
+        if(!empty($goods_member_discount_detail["money"])){
+            return $goods_member_discount_detail["money"];
         }else{
             return 0;
         }

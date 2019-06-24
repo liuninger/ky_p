@@ -48,7 +48,7 @@ class Goods extends BaseController
     /**
      * 商品详情
      *
-     * @return Ambigous <\think\response\View, \think\response\$this, \think\response\View>
+     * @return Ambigous <\think\response\View, \think\rgoodsdetailesponse\$this, \think\response\View>
      */
     public function goodsDetail()
     {

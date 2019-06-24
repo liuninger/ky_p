@@ -300,7 +300,7 @@ class NfxPromoter extends BaseService implements INfxPromoter
      * (non-PHPdoc)
      * @see \data\api\IPromoter::addPromoterLevel()
      */
-    public function addPromoterLevel($shop_id, $level_name, $level_money, $level_0, $level_1, $level_2,$level_rate)
+    public function addPromoterLevel($shop_id, $level_name, $level_money, $level_0, $level_1, $level_2,$level_rate,$parent_rate)
     {
         $promoter_level = new NfxPromoterLevelModel();
         $data = array(
@@ -311,6 +311,7 @@ class NfxPromoter extends BaseService implements INfxPromoter
             "level_1" => $level_1,
             "level_2" => $level_2,
             "level_rate" => $level_rate,
+            "parent_rate" => $parent_rate,
             "create_time" => time()
         );
         $promoter_level->save($data);
@@ -322,7 +323,7 @@ class NfxPromoter extends BaseService implements INfxPromoter
      * (non-PHPdoc)
      * @see \data\api\IPromoter::updatePromoterLevel()
      */
-    public function updatePromoterLevel($level_id, $level_name, $level_money, $level_0, $level_1, $level_2,$level_rate)
+    public function updatePromoterLevel($level_id, $level_name, $level_money, $level_0, $level_1, $level_2,$level_rate,$parent_rate)
     {
         $promoter_level = new NfxPromoterLevelModel();
         $data = array(
@@ -332,6 +333,7 @@ class NfxPromoter extends BaseService implements INfxPromoter
             "level_1" => $level_1,
             "level_2" => $level_2,
             "level_rate" => $level_rate,
+            "parent_rate" => $parent_rate,
             "modify_time" => time()
         );
         $retval = $promoter_level->save($data, [

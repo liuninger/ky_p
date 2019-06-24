@@ -6,8 +6,7 @@
 var is_full_payment = 0;
 $(function() {
 	is_full_payment = $('#is_full_payment').is(":checked");
-	
-	$('#is_full_payment').click(function(){
+    $('#is_full_payment').click(function(){
 		var is_full_payment = $('#is_full_payment').is(":checked");
 		if(!is_full_payment){
 			price = $("#hidden_presell").val();
@@ -627,7 +626,8 @@ function echoSpecData(){
 				active = $("#submit_ok").attr("tag");
 				if (active == 'addCart' || active == 'buyBtn1' || active == 'theSelected' || active == 'js_point_exchange') {
 					price = $this.attr("price");
-					$("#price").text("￥" + price);
+
+                    $("#price").text("￥" + price);
 					$("#hiddSkuprice").val(price);	
 				}else if(active == "spelling"){
 					price = $("#hidden_pintuan_price").val();

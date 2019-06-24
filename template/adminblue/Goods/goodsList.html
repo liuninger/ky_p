@@ -100,12 +100,12 @@ input, textarea, .uneditable-input {width: 147px;}
 			{include file='adminblue/Goods/goodsThreeCategory'/}
 			<span class="interval"></span>
 			<span>商品名称：</span>
-			<input id="goods_name" class="input-medium input-common middle" type="text" value="{$search_info}" placeholder="要搜索的商品名称" >	
+			<input id="goods_name" class="input-medium input-common middle" type="text" value="{$search_info}" placeholder="要搜索的商品名称" >
 			<span class="interval"></span>
 			<button class="btn-common-white more-search"><i class="fa fa-chevron-down"></i></button>
 			<span class="interval"></span>
 			<button onclick="searchData()" class="btn-common">搜索</button>
-			
+
 			<!-- 更多搜索 -->
 			<div class="more-search-container">
 				<dl>
@@ -180,7 +180,7 @@ input, textarea, .uneditable-input {width: 147px;}
 				<col style="width: 2%;">
 				<col style="width: 25%;">
 				<col style="width: 15%;">
-				
+
 				<col style="width: 15%;">
 				<col style="width: 11%;">
 				<col style="width: 11%;">
@@ -251,10 +251,10 @@ $(function(){
 	}).live("keyup",function(event){
 		if(event.keyCode == 13) $(this).blur();
 	});
-	
+
 	//排序规则
 	$(".goods-fields-sort").click(function(){
-		
+
 		var field = $(this).attr("data-field");
 		var sort_rule = $(this).attr("data-field");
 		$(this).siblings().css("color","#333333").find("span").removeClass("desc selected").addClass("desc");
@@ -287,7 +287,7 @@ function hideSetRecommend(){
 }
 
 function LoadingInfo(page_index) {
-	
+
 	var start_date = $("#startDate").val();
 	var end_date = $("#endDate").val();
 	var state = $("#state").val();
@@ -381,7 +381,7 @@ function LoadingInfo(page_index) {
 										html += data["data"][i]["is_new"] == 1 ? '<i class="new">新</i>' : '';
 										if(data["data"][i]['goods_group_name'] != '' && data["data"][i]['goods_group_name'] != undefined){
 											var tmp_array = data["data"][i]['goods_group_name'].split(",");
-											$.each(tmp_array,function(k,v){	
+											$.each(tmp_array,function(k,v){
 												if(v != ""){
 													html += '<i style="color:#999;font-size:12px;margin-top:5px;padding:1px 4px;border-radius:3px;display:inline-block;color:#FFF;background-color:#FF6600;text-decoration: none;height:16px;line-height: 16px;overflow:hidden;margin-right:5px;text-align:center;font-style:normal;">'+v+'</i>';
 												}
@@ -415,7 +415,7 @@ function LoadingInfo(page_index) {
 								html += '<span class="pro-stock" style="color: #666;" id="moreChangeStock'+ data["data"][i]["goods_id"]+'">' + data["data"][i]["real_sales"] + '</span>';
 							html += '</div>';
 						html += '</td>';
-						
+
 						html += '<td style="text-align: center;">';
 						if(data['data'][i]['goods_type'] == 1){
 							html += '<span>实物类</span>';
@@ -468,7 +468,7 @@ function code(){
 	$(".div-flag-style").mouseout(function(){
 		$(this).children('.QRcode').hide();
 	});
-} 
+}
 
 //把值传过去即可
 function updateGoodsDetail(goods_id) {
@@ -700,7 +700,7 @@ function setRecommend(){
 				$("#setRecommend").popover("hide");
 				LoadingInfo(getCurrentIndex(goods_ids,'#productTbody','tr[class="tr-title"]'));
 				showTip(data['message'],"success");
-			} 
+			}
 		}
 	})
 }

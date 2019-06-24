@@ -452,9 +452,12 @@ class Goods extends BaseController
                 if ($goodsId > 0) {
                     $discount_info = $goods -> getGoodsDiscountByMemberLevel($val["level_id"], $goodsId);
                     $level_list["data"][$key]["discount"] = $discount_info["discount"];
+                    $level_list["data"][$key]["money"] = $discount_info["money"];
                     $level_list["data"][$key]["decimal_reservation_number"] = $discount_info["decimal_reservation_number"];
                 }else{
                     $level_list["data"][$key]["discount"] = "";
+                    $level_list["data"][$key]["money"] = "";
+
                     $level_list["data"][$key]["decimal_reservation_number"] = -1;
                 }
             }
@@ -1169,6 +1172,7 @@ class Goods extends BaseController
                 $product['presell_day'], 
                 $product['goods_unit'],
                 $product['member_discount_arr'],
+                $product['member_money_arr'],
                 $product['decimal_reservation_number'],
                 $product['integral_give_type']
             );
@@ -1184,7 +1188,6 @@ class Goods extends BaseController
                 $goodservice->goods_QRcode_make($goodsId, $pay_qrcode);
             }
         }
-        
         return $res;
     }
 
@@ -2284,8 +2287,10 @@ class Goods extends BaseController
             $goods = new GoodsService(); 
             $goods_ids = request()->post("goods_ids", "");
             $discount_info = request()->post("member_discount_arr", "");
+            $money_info = request()->post("member_money_arr", "");
             $decimal_reservation_number = request()->post("decimal_reservation_number", -1);
             $res = $goods -> setMemberDiscount($goods_ids, $discount_info, $decimal_reservation_number);
+            $res = $goods -> setMemberMoney($goods_ids, $money_info);
             return $res;
         }
     }

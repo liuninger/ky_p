@@ -28,7 +28,9 @@
 						<!--<th>店内销售佣金比率</th>-->
 						<!--<th>给上级的佣金比率</th>-->
 						<!--<th>给上上级的佣金比率</th>-->
-						<th>佣金比率</th>
+						<th>推广佣金比率</th>
+						<th>上级佣金比率</th>
+						<!--<th>佣金比率</th>-->
 						<th>创建时间</th>
 						<th>操作</th>
 					</tr>
@@ -75,9 +77,10 @@
 						// html += '<td>' + data["data"][i]["level_1"] + '</td>';
 						// html += '<td>' + data["data"][i]["level_2"] + '</td>';
 						html += '<td>' + data["data"][i]["level_rate"] + '</td>';
+						html += '<td>' + data["data"][i]["parent_rate"] + '</td>';
 						html += '<td>' + timeStampTurnTime(data["data"][i]["create_time"]) + '</td>';
-						html += '<td><a href="'+__URL('ADMIN_MAIN/distribution/updatepromoterlevel?level_id='+ data["data"][i]["level_id"])+'">修改</a> ';
-                    // &nbsp;&nbsp;<a href="javascript:void(0);" onclick="deleteBox('+ data["data"][i]["level_id"] +');">删除</a></td>
+						html += '<td><a href="'+__URL('ADMIN_MAIN/distribution/updatepromoterlevel?level_id='+ data["data"][i]["level_id"])+'">修改</a>&nbsp;&nbsp;<a href="javascript:void(0);" onclick="deleteBox(\'+ data["data"][i]["level_id"] +\');">删除</a></td> ';
+                    //
 						html += '</tr>';
 					}
 				} else {

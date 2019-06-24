@@ -38,7 +38,7 @@
 			<th>会员等级</th> 
 			<th>推广员编号</th> 
 			<th>积分</th>
-			<th>账户余额</th>
+			<!--<th>账户余额</th>-->
 			<th>注册&登录</th>
 			<th>状态</th>
 			<th style="width: 20%;">操作</th>
@@ -491,7 +491,7 @@ function LoadingInfo(page_index) {
 					}
 					
 					html += '<td>' + data["data"][i]["point"] + '</td>';
-					html += '<td>'+'¥'+ data["data"][i]["balance"] +'</td>';
+					// html += '<td>'+'¥'+ data["data"][i]["balance"] +'</td>';
 					html += '<td>' +'注册时间 : '+ timeStampTurnTime(data["data"][i]["reg_time"]) +'<br>'+'最后登录 : '+ timeStampTurnTime(data["data"][i]["current_login_time"])+'</td>';
 					html += data["data"][i]["user_status"] == 0 ? '<td style="color:red;">锁定</td>' : '<td style="color:green;">正常</td>';
 					html += '<td>';
@@ -499,7 +499,7 @@ function LoadingInfo(page_index) {
 					//html += '<a href="'+__URL('ADMIN_MAIN/member/balancedetail?member_id='+ data['data'][i]['uid'])+'">余额明细</a><br/>';
 					html += '<a href="'+__URL('ADMIN_MAIN/member/accountdetail?member_id='+ data['data'][i]['uid'])+'">账户明细</a><br/>';
 					html += '<a onclick="recharge_point('+ data["data"][i]["uid"]+','+ data["data"][i]["point"] +')">积分调整</a>&nbsp;&nbsp;';
-					html += '<a onclick="recharge_balance('+ data["data"][i]["uid"]+','+data["data"][i]["balance"]+')">余额调整</a><br/>';
+					// html += '<a onclick="recharge_balance('+ data["data"][i]["uid"]+','+data["data"][i]["balance"]+')">余额调整</a><br/>';
 					
 					if(data["data"][i]["is_system"] != 1){
 						if(data["data"][i]["user_status"] == 0){

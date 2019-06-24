@@ -48,6 +48,13 @@
 		</dd>
 	</dl>
 	<dl>
+		<dt>上级佣金收入比率:</dt>
+		<dd>
+			<p><input name="" id="parent_rate" type="text" value="{$premoter_level_info.parent_rate}" class="input-common harf" onkeyup="javascript:CheckInputIntFloat(this);"/><em class="unit">%</em></p>
+			<p class="error">请输入推广佣金收入比率</p>
+		</dd>
+	</dl>
+	<dl>
 		<dt></dt>
 		<dd>
 		<button class="btn-common btn-big" onclick="updatePromoterLevel();">提交</button>
@@ -63,6 +70,7 @@
 		var level_1 = $("#level_1").val();
 		var level_2 = $("#level_2").val();
         var level_rate = $("#level_rate").val();
+        var parent_rate = $("#parent_rate").val();
 		//var level_id = $("#level_id").val();
 		if(level_name == ""){
 			$("#level_name").parent().next().show();
@@ -75,7 +83,11 @@
 		// 	return false;
 		// }
         if(parseFloat(level_rate)>100 ){
-            showMessage('error', "佣金比率不可超过100%！");
+            showMessage('error', "推广佣金比率不可超过100%！");
+            return false;
+        }
+        if(parseFloat(parent_rate)>100 ){
+            showMessage('error', "上级佣金比率不可超过100%！");
             return false;
         }
 		$.ajax({
@@ -88,6 +100,7 @@
 				'level_1':level_1,
 				'level_2':level_2,
 				'level_rate' :level_rate,
+				'parent_rate' :parent_rate,
 				'level_id':{$level_id}
 			},
 			async:true,

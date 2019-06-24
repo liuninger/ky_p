@@ -146,24 +146,27 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
     private function getPromoter()
     {
         if (!empty($this->order_info)) {
+
             $this->buyer_uid = $this->order_info['buyer_id'];
             //店铺会员关联表
             $shop_member_association = new NfxShopMemberAssociationModel();
             $promoter_info = $shop_member_association->getInfo(['shop_id' => $this->shop_id, 'uid' => $this->buyer_uid], 'promoter_id, partner_id');
 
             if (!empty($promoter_info)) {
-                if ($this->is_distribution_start == 1) {
-                    $this->promoter_id = $promoter_info['promoter_id'];
-                } else {
-                    //判断此推广员id是否是本会员的推广员id
-                    $promoter_model = new NfxPromoterModel();
-                    $promoter_real_info = $promoter_model->getInfo(['shop_id' => $this->shop_id, 'uid' => $this->buyer_uid, "promoter_id" => $promoter_info['promoter_id']], "parent_promoter");
-                    if (!empty($promoter_real_info)) {
-                        $this->promoter_id = $promoter_real_info['parent_promoter'];
-                    } else {
-                        $this->promoter_id = $promoter_info['promoter_id'];
-                    }
-                }
+//                if ($this->is_distribution_start == 1) {
+//                    $this->promoter_id = $promoter_info['promoter_id'];
+//                } else {
+//                    //判断此推广员id是否是本会员的推广员id
+//                    $promoter_model = new NfxPromoterModel();
+//                    $promoter_real_info = $promoter_model->getInfo(['shop_id' => $this->shop_id, 'uid' => $this->buyer_uid, "promoter_id" => $promoter_info['promoter_id']], "parent_promoter");
+//
+//                    if (!empty($promoter_real_info)) {
+//                        $this->promoter_id = $promoter_real_info['parent_promoter'];
+//                    } else {
+//                        $this->promoter_id = $promoter_info['promoter_id'];
+//                    }
+//                }
+                $this->promoter_id = $promoter_info['promoter_id'];
                 $this->partner_id = $promoter_info['partner_id'];
                 // 当前不是股东时 查找他的上级推广股东id
                 if(empty($this->partner_id)){
@@ -173,7 +176,6 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
                 $this->promoter_id = 0;
                 $this->partner_id = 0;
             }
-
         }
     }
 
@@ -200,6 +202,7 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
      */
     public function orderdistributionCommissions()
     {
+
         if ($this->is_distribution_enable == 1) {
             $commossion_distribution = new NfxCommissionDistributionModel();
             if (empty($this->order_info)) {
@@ -220,6 +223,7 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
                         {
                             //查询对应推广员
                             $promoter_id = $this->promoter_id;
+
                             // Log::write('promoter_id！'.$promoter_id);
                             if ($promoter_id != 0) {
                                 $promoter_model = new NfxPromoterModel();
@@ -288,17 +292,20 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
                             //查询对应推广员
                             $promoter_id = $this->promoter_id;
                             // Log::write('promoter_id！'.$promoter_id);
-
                             if ($promoter_id != 0) {
                                 $nfx_promoter_service = new NfxPromoter();
                                 $promoter_model = new NfxPromoterModel();
                                 $promoter_info = $promoter_model->getInfo(['promoter_id' => $promoter_id], 'parent_promoter,promoter_level,uid');
-                                $commission_count = $this->isOnePromoterCommission($promoter_info['uid']);
-                                if($commission_count > 0){
-                                    $parent_arr = $nfx_promoter_service->getPromoterParentPointQuery($promoter_id,0);
-                                }else{
-                                    $parent_arr = $nfx_promoter_service->getPromoterParentQuery($promoter_id,0);
-                                }
+                                $parent_arr = $nfx_promoter_service->getPromoterParentQuery($promoter_id,0);
+
+
+//                                $commission_count = $this->isOnePromoterCommission($promoter_info['uid']);
+//                                if($commission_count > 0){
+//                                    $parent_arr = $nfx_promoter_service->getPromoterParentPointQuery($promoter_id,0);
+//
+//                                }else{
+//                                    $parent_arr = $nfx_promoter_service->getPromoterParentQuery($promoter_id,0);
+//                                }
                                 $promoter_level = $promoter_info['promoter_level'];
                                 $promoter_level_model = new NfxPromoterLevelModel();
                                 $promoter_level_info = $promoter_level_model->get($promoter_level);
@@ -313,8 +320,11 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
                                     if($commission_money <=0 ) continue;
                                     $parent_promoter_info = $promoter_model->getInfo(['promoter_id' => $v], 'parent_promoter,promoter_level');
                                     if(empty($parent_promoter_info)) continue;
-                                    $retval = $this->addOrderDistributionCommission($this->shop_id, $v, $this->order_info['order_id'], $order_goods['order_goods_id'], $order_goods['real_pay'], $order_goods['cost_price'], $goods_return, $k+1, $this->distribution_commission_rate, $promoter_level_info['level_rate'],$commission_money);
-                                    $commission_money =  (float)sprintf("%.2f",$commission_money * ($promoter_level_info['level_rate'] / 100));
+                                    $parent_promoter_money = (float)sprintf("%.2f",$commission_money * ($promoter_level_info['parent_rate'] / 100));
+
+                                    if($parent_promoter_money <=0 ) continue;
+                                    $retval = $this->addOrderDistributionCommission($this->shop_id, $v, $this->order_info['order_id'], $order_goods['order_goods_id'], $order_goods['real_pay'], $order_goods['cost_price'], $goods_return, $k+1, $this->distribution_commission_rate, $promoter_level_info['parent_rate'],$parent_promoter_money);
+                                    $commission_money =  (float)sprintf("%.2f",$commission_money - $parent_promoter_money);
                                 }
 
 
@@ -391,7 +401,7 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
      * @param unknown $goods_commission_rate
      * @param unknown $commission_rate
      */
-    private function addOrderDistributionCommission($shop_id, $promoter_id, $order_id, $order_goods_id, $goods_money, $goods_cost, $goods_return, $promoter_level, $goods_commission_rate, $commission_rate)
+    private function addOrderDistributionCommission($shop_id, $promoter_id, $order_id, $order_goods_id, $goods_money, $goods_cost, $goods_return, $promoter_level, $goods_commission_rate, $commission_rate,$commission_money = 0)
     {
         $commossion_distribution = new NfxCommissionDistributionModel();
         if ($goods_return < 0) {
@@ -410,7 +420,7 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
             'goods_return' => $goods_return,
             'goods_commission_rate' => $goods_commission_rate,
             'commission_rate' => $commission_rate,
-            'commission_money' => $goods_return * $goods_commission_rate / 100 * $commission_rate / 100,
+            'commission_money' =>  $commission_money > 0 ? $commission_money : ($goods_return * $goods_commission_rate / 100) * ($commission_rate / 100),
             'create_time' => time()
         );
 

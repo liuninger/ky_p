@@ -43,12 +43,16 @@
 				{foreach name="$level_list" item="vo"}
 					<dl>
 						<dt>{$vo.level_name}</dt>
+						<!--<dd style="display: none;">-->
+							<!--<input class="input-common harf" type="number" data-level-id="{$vo.level_id}" maxlength="3"><em class="unit">%</em>-->
+						<!--</dd>-->
 						<dd>
-							<input class="input-common harf" type="number" data-level-id="{$vo.level_id}" maxlength="3"><em class="unit">%</em>
+							<input class="input-common harf" type="number" data-level-id="{$vo.level_id}" maxlength="3"><em class="unit">元</em>
 						</dd>
+						
 					</dl>
 				{/foreach}
-				<dl>
+				<dl style="display: none;">
 					<dt>价格保留方式</dt>
 					<dd>
 						<label class="radio inline normal decimal_reservation_number">
@@ -78,14 +82,22 @@
 	var is_sub = false;
 	function save_goods_discount(){
 		var member_discount_arr = new Array();
+		var member_money_arr = new Array();
 		$("#member_discount dl dd input[type='number']").each(function(){
-			var discount = parseInt($(this).val());
-			if(discount != NaN && discount > 0 && discount <= 100){
-				var member_discount = new Object();
-					member_discount.level_id = $(this).attr("data-level-id");
-					member_discount.discount = discount;
-				member_discount_arr.push(member_discount);
-			}
+			// var discount = parseInt($(this).val());
+			// if(discount != NaN && discount > 0 && discount <= 100){
+			// 	var member_discount = new Object();
+			// 		member_discount.level_id = $(this).attr("data-level-id");
+			// 		member_discount.discount = discount;
+			// 	member_discount_arr.push(member_discount);
+			// }
+            var money = parseInt($(this).val());
+            if(money != NaN && money > 0 ){
+                var member_money = new Object();
+                member_money.level_id = $(this).attr("data-level-id");
+                member_money.money = money;
+                member_money_arr.push(member_money);
+            }
 		})
 
 		var goods_ids= new Array();
@@ -101,7 +113,7 @@
 		var decimal_reservation_number = $("input[name='decimal-reservation-number']:checked").val();
 			decimal_reservation_number = decimal_reservation_number == undefined ? -1 : decimal_reservation_number;
 			
-		if(member_discount_arr.length > 0 && goods_ids.length > 0){
+		if(member_money_arr.length > 0 && goods_ids.length > 0){
 			if(is_sub) return;
 			is_sub = true;
 			$.ajax({
@@ -109,6 +121,7 @@
 				url : "{:__URL('ADMIN_MAIN/goods/setMemberDiscount')}",
 				data : {
 					member_discount_arr : JSON.stringify(member_discount_arr),
+					member_money_arr : JSON.stringify(member_money_arr),
 					goods_ids : goods_ids.toString(),
 					decimal_reservation_number : decimal_reservation_number
 				},
@@ -144,7 +157,8 @@
 				if(data['discount_list'].length > 0){
 					for (var i = 0; i < data['discount_list'].length; i++) {
 						var discount_info = data['discount_list'][i];
-						$("input[data-level-id='"+discount_info['level_id']+"']").val(discount_info['discount']);
+						// $("input[data-level-id='"+discount_info['level_id']+"']").val(discount_info['discount']);
+						$("input[data-level-id='"+discount_info['level_id']+"']").val(discount_info['money']);
 					}
 				}
 				if(data['decimal_reservation_number'] >= 0){

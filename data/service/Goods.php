@@ -288,7 +288,7 @@ class Goods extends BaseService implements IGoods
      *
      * @return \data\model\NsGoodsModel|number
      */
-    public function addOrEditGoods($goods_id, $goods_name, $shopid, $category_id, $category_id_1, $category_id_2, $category_id_3, $supplier_id, $brand_id, $group_id_array, $goods_type, $market_price, $price, $cost_price, $point_exchange_type, $point_exchange, $give_point, $is_member_discount, $shipping_fee, $shipping_fee_id, $stock, $max_buy, $min_buy, $min_stock_alarm, $clicks, $sales, $collects, $star, $evaluates, $shares, $province_id, $city_id, $picture, $keywords, $introduction, $description, $QRcode, $code, $is_stock_visible, $is_hot, $is_recommend, $is_new, $sort, $image_array, $sku_array, $state, $sku_img_array, $goods_attribute_id, $goods_attribute, $goods_spec_format, $goods_weight, $goods_volume, $shipping_fee_type, $extend_category_id, $sku_picture_values, $virtual_goods_type_data, $production_date, $shelf_life, $ladder_preference, $goods_video_address, $pc_custom_template, $wap_custom_template, $max_use_point, $is_open_presell, $presell_delivery_type, $presell_price, $presell_time, $presell_day, $goods_unit, $discount_info, $decimal_reservation_number, $integral_give_type)
+    public function addOrEditGoods($goods_id, $goods_name, $shopid, $category_id, $category_id_1, $category_id_2, $category_id_3, $supplier_id, $brand_id, $group_id_array, $goods_type, $market_price, $price, $cost_price, $point_exchange_type, $point_exchange, $give_point, $is_member_discount, $shipping_fee, $shipping_fee_id, $stock, $max_buy, $min_buy, $min_stock_alarm, $clicks, $sales, $collects, $star, $evaluates, $shares, $province_id, $city_id, $picture, $keywords, $introduction, $description, $QRcode, $code, $is_stock_visible, $is_hot, $is_recommend, $is_new, $sort, $image_array, $sku_array, $state, $sku_img_array, $goods_attribute_id, $goods_attribute, $goods_spec_format, $goods_weight, $goods_volume, $shipping_fee_type, $extend_category_id, $sku_picture_values, $virtual_goods_type_data, $production_date, $shelf_life, $ladder_preference, $goods_video_address, $pc_custom_template, $wap_custom_template, $max_use_point, $is_open_presell, $presell_delivery_type, $presell_price, $presell_time, $presell_day, $goods_unit, $discount_info, $money_info, $decimal_reservation_number, $integral_give_type)
     {
         Cache::clear("niu_goods_group");
         Cache::clear("niu_goods_category_block");
@@ -667,10 +667,10 @@ class Goods extends BaseService implements IGoods
                 $virtual_goods_service = new VirtualGoods();
                 $res_virtual_goods_type = $virtual_goods_service->editVirtualGoodsType($virtual_data['virtual_goods_type_id'], $virtual_data['virtual_goods_group_id'], $virtual_data['validity_period'], $virtual_data['confine_use_number'], $value_info, $goods_id);
             }
-            
             //设置会员折扣
             $this->setMemberDiscount($goods_id, $discount_info, $decimal_reservation_number);
-            
+            $this->setMemberMoney($goods_id, $money_info);
+
             if ($error == 0) {
                 $this->goods->commit();
                 return $goods_id;
@@ -1201,11 +1201,19 @@ class Goods extends BaseService implements IGoods
          */
         // 会员的折扣价格
         $goods_preference = new GoodsPreference();
+        $member_money = 0;
         if (! empty($this->uid)) {
             // 判断商品有没有设置会员折扣率 有的话使用 没有则使用店铺设置的 
             $goods_member_discount = $goods_preference -> getGoodsMemberDiscount($this->uid, $goods_detail["goods_id"]);
-            if(!empty($goods_member_discount)){
+            $goods_member_discount_money = $goods_preference->getGoodsMemberDiscountMoney($this->uid, $goods_detail["goods_id"]);
+//            if(!empty($goods_member_discount)){
+//                $member_discount = $goods_member_discount;
+//            }else{
+//                $member_discount = $goods_preference->getMemberLevelDiscount($this->uid);
+//            }
+            if(!empty($goods_member_discount_money)){
                 $member_discount = $goods_member_discount;
+                $member_money = $goods_member_discount_money;
             }else{
                 $member_discount = $goods_preference->getMemberLevelDiscount($this->uid);
             }
@@ -1218,13 +1226,24 @@ class Goods extends BaseService implements IGoods
         } else {
             $goods_detail['is_show_member_price'] = 1;
         }
-        $member_price = $this->handleMemberPrice($goods_detail["goods_id"], ($member_discount * $goods_detail['price']));
+        if($member_money > 0){
+            $member_price = $this->handleMemberPrice($goods_detail["goods_id"], $member_money);
+        }else{
+            $member_price = $this->handleMemberPrice($goods_detail["goods_id"], ($member_discount * $goods_detail['price']));
+        }
+
         $goods_detail['member_price'] = sprintf("%.2f", $member_price);
+
         // 商品sku价格
         foreach ($goods_detail['sku_list'] as $k => $goods_sku) {
-            $goods_detail['sku_list'][$k]['member_price'] = $this->handleMemberPrice($goods_detail["goods_id"], ($goods_sku['price'] * $member_discount));
+            if($member_money > 0){
+                $goods_detail['sku_list'][$k]['member_price'] = $this->handleMemberPrice($goods_detail["goods_id"], $member_money);
+            }else{
+                $goods_detail['sku_list'][$k]['member_price'] = $this->handleMemberPrice($goods_detail["goods_id"], ($goods_sku['price'] * $member_discount));
+            }
+
         }
-        
+
         /**
          * *******************************************会员价格-end*********************************************************
          */
@@ -5191,6 +5210,54 @@ class Goods extends BaseService implements IGoods
              );
          }
     }
+
+    /**
+     *
+     * @param unknown $goods_ids
+     * @param unknown $discount_info
+     */
+    public function setMemberMoney($goods_ids, $money_info){
+        if(!empty($goods_ids) && !empty($money_info)){
+            $ns_goods_member_discount = new NsGoodsMemberDiscountModel();
+            $ns_goods_member_discount -> startTrans();
+            try {
+                $money_info_arr = json_decode($money_info, true);
+                $goods_ids = explode(",", $goods_ids);
+                foreach ($goods_ids as $goods_id){
+                    foreach($money_info_arr as $v){
+                        $count = $ns_goods_member_discount -> getCount(["level_id" => $v["level_id"], "goods_id"=>$goods_id]);
+                        $data["goods_id"] = $goods_id;
+                        $data["money"] = $v["money"];
+                        $data["level_id"] = $v["level_id"];
+                        if($count == 0){
+                            $ns_goods_member_discount = new NsGoodsMemberDiscountModel();
+                            $ns_goods_member_discount -> save($data);
+                        }else{
+                            $ns_goods_member_discount = new NsGoodsMemberDiscountModel();
+                            $ns_goods_member_discount -> save($data, ["level_id" => $v["level_id"], "goods_id"=>$goods_id]);
+                        }
+                    }
+                }
+
+                $ns_goods_member_discount -> commit();
+                return array(
+                    "code" => 1,
+                    "message" => "设置成功"
+                );
+            } catch (\Exception $e) {
+                $ns_goods_member_discount -> rollback();
+                return array(
+                    "code" => 0,
+                    "message" => $e->getMessage()
+                );
+            }
+        }else{
+            return array(
+                "code" => 0,
+                "message" => "操作失败"
+            );
+        }
+    }
     
     /**
      * 获取商品会员折扣
@@ -5200,12 +5267,13 @@ class Goods extends BaseService implements IGoods
      */
     public function getGoodsDiscountByMemberLevel($level_id, $goods_id){
         $ns_goods_member_discount = new NsGoodsMemberDiscountModel();
-        $goods_member_discount_detail = $ns_goods_member_discount -> getInfo(["level_id" => $level_id, "goods_id" => $goods_id], "discount,decimal_reservation_number");
+        $goods_member_discount_detail = $ns_goods_member_discount -> getInfo(["level_id" => $level_id, "goods_id" => $goods_id], "discount,decimal_reservation_number,money");
         if(!empty($goods_member_discount_detail["discount"])){
             $member_level_discount = $goods_member_discount_detail;
         }else{
             $member_level_discount = array(
                 "discount" => "",
+                "money" => "",
                 "decimal_reservation_number" => -1
             );
         }
@@ -5218,7 +5286,7 @@ class Goods extends BaseService implements IGoods
      */
     public function showMemberDiscount($goods_id){
         $ns_goods_member_discount = new NsGoodsMemberDiscountModel();
-        $discount_list = $ns_goods_member_discount -> getQuery(["goods_id"=>$goods_id], "level_id,discount,decimal_reservation_number", "");
+        $discount_list = $ns_goods_member_discount -> getQuery(["goods_id"=>$goods_id], "level_id,discount,decimal_reservation_number,money", "");
         
         $decimal_reservation_number = -1;
         if(!empty($discount_list)){

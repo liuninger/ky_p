@@ -915,14 +915,19 @@
 			{foreach name="$level_list" item="vo"}
 				<dl>
 					<dt>{$vo.level_name}：</dt>
+					<dd style="display: none;">
+						<div class="controls" >
+							<input class="input-common harf" name="member_discount" placeholder="0" min="0" type="number" value="{$vo.discount}" data-level-id="{$vo.level_id}"/><em class="unit">%</em>
+						</div>
+					</dd>
 					<dd>
 						<div class="controls">
-							<input class="input-common harf" name="member_discount" placeholder="0" min="0" type="number" value="{$vo.discount}" data-level-id="{$vo.level_id}"/><em class="unit">%</em>
+							<input class="input-common harf" name="member_money" placeholder="0" min="0" type="number" value="{$vo.money}" data-level-id="{$vo.level_id}"/><em class="unit">元</em>
 						</div>
 					</dd>
 				</dl>
 			{/foreach}
-			<dl>
+			<dl style="display: none;">
 				<dt>价格保留方式：</dt>
 				<dd>
 					<label class="radio inline normal decimal_reservation_number">

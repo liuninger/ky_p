@@ -320,11 +320,9 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
                                     if($commission_money <=0 ) continue;
                                     $parent_promoter_info = $promoter_model->getInfo(['promoter_id' => $v], 'parent_promoter,promoter_level');
                                     if(empty($parent_promoter_info)) continue;
-                                    $parent_promoter_money = (float)sprintf("%.2f",$commission_money * ($promoter_level_info['parent_rate'] / 100));
-
-                                    if($parent_promoter_money <=0 ) continue;
-                                    $retval = $this->addOrderDistributionCommission($this->shop_id, $v, $this->order_info['order_id'], $order_goods['order_goods_id'], $order_goods['real_pay'], $order_goods['cost_price'], $goods_return, $k+1, $this->distribution_commission_rate, $promoter_level_info['parent_rate'],$parent_promoter_money);
-                                    $commission_money =  (float)sprintf("%.2f",$commission_money - $parent_promoter_money);
+                                    $rate = $k == 0 ? $promoter_level_info['level_rate'] : $promoter_level_info['parent_rate'];
+                                    $retval = $this->addOrderDistributionCommission($this->shop_id, $v, $this->order_info['order_id'], $order_goods['order_goods_id'], $order_goods['real_pay'], $order_goods['cost_price'], $goods_return, $k+1, $this->distribution_commission_rate, $rate,$commission_money);
+                                    $commission_money =  (float)sprintf("%.2f",$commission_money * $promoter_level_info['parent_rate']);
                                 }
 
 

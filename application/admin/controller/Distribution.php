@@ -469,6 +469,8 @@ class Distribution extends BaseController
             $level_1 = request()->post("level_1", 0);
             $level_2 = request()->post("level_2", 0);
             $nfx_config = new NfxCommissionConfig();
+            $level_rate = request()->post("level_rate", 0);
+            $rate = $level_rate;
             $rate = $level_0 + $level_1 + $level_2;
             if ($level_id > 0) {
                 $is_res = $nfx_config->getCommissionIsMax($rate, 'edit', 'promoter', $level_id);
@@ -485,7 +487,7 @@ class Distribution extends BaseController
 //             $level_1 = $_POST["level_1"];
 //             $level_2 = $_POST["level_2"];
             $promoter = new NfxPromoterService();
-            $retval = $promoter->updatePromoterLevel($level_id, $level_name, $level_money, $level_0, $level_1, $level_2);
+            $retval = $promoter->updatePromoterLevel($level_id, $level_name, $level_money, $level_0, $level_1, $level_2,$level_rate);
             return AjaxReturn($retval);
         } else {
             $level_id = $_GET["level_id"];

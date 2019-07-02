@@ -1208,9 +1208,9 @@ class NfxPromoter extends BaseService implements INfxPromoter
      */
     public function getPromoterInfo($uid){
         $promoter = new NfxPromoterModel();
-
+        $first_info = $promoter->getFirstData([],'promoter_id ASC');
         $info = $promoter->getInfo(['uid'=>$uid]);
-
+        $info['first_promoter_no'] = $first_info['promoter_no'];
         return $info;
     }
 

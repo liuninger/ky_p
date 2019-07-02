@@ -278,7 +278,7 @@ $(function(){
         url : "{:__URL('APP_MAIN/index/userIsParent')}",
         data : {},
         success : function(data){
-            if(parseInt(data.data.parent_promoter) <= 0){
+            if(parseInt(data.data.parent_promoter) <= 0 && data.data.promoter_no != data.data.first_promoter_no ){
                 $(".motify").css('z-index','99999999')
                 layer.confirm($(".parent-block").html(), {icon: 3, title:'绑定推荐人'}, function(index){
 					var mobile = parent_mobile

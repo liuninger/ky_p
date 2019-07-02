@@ -114,9 +114,9 @@ class NfxCommissionCalculate extends BaseService implements INfxCommissionCalcul
                 $this->instance_id = 0;
                 $shop_config_info = $shop_config->getShopConfigDetail($this->instance_id);
                 if ($shop_config_info['distribution_use'] == 1) {
-                    $goods_return_money = $order_goods['goods_money'] - $order_goods['refund_real_money'] - $promotion_money;
+                    $goods_return_money = $order_goods['goods_money']  + $order_goods['adjust_money'] - $order_goods['refund_real_money'] - $promotion_money;
                 } else {
-                    $goods_return_money = $order_goods['goods_money'] - $order_goods['refund_real_money'] - $promotion_money - $order_goods['cost_price'];
+                    $goods_return_money = $order_goods['goods_money'] + $order_goods['adjust_money']  - $order_goods['refund_real_money'] - $promotion_money - $order_goods['cost_price'];
                 }
                 if ($goods_return_money < 0) {
                     $goods_return_money = 0;

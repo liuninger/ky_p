@@ -15,7 +15,10 @@
  */
 namespace app\wap\controller;
 
+use data\model\NfxCommissionDistributionModel;
 use data\model\NfxShopCommissionWithdrawConfigModel;
+use data\model\NfxUserAccountModel;
+use data\model\NfxUserAccountRecordsModel;
 use data\service\Config;
 use data\service\Goods;
 use data\service\GoodsCategory;
@@ -418,18 +421,22 @@ class Index extends BaseController
 
     public function test()
     {
-        $commissionCalculate = new NfxCommissionCalculate(24);
-        // 分销佣金计算
-//        $res = $commissionCalculate->orderdistributionCommission();
+       $nfx_service = new NfxCommissionDistributionModel();
+       $recodes_model = new NfxUserAccountRecordsModel();
+       $account_model = new NfxUserAccountModel();
 
-        // 区域代理计算
-//        $res = $commissionCalculate->orderRegionAgentCommission();
+       $list = $nfx_service->getQuery(['order_id'=>['in','121,122,123,124,125']],'*','id asc');
+       foreach ($list as $k=>$v){
+           $alis_id = $v['alis_id'];
+           $info = $recodes_model->getInfo(['type_alis_id'=>$alis_id],'*');
+           $account_info = $account_model->getInfo(['uid'=>$info['uid']],'*');
+           $account_model->save([
+                'commission' => $account_info['commission'] -$info['money'],
+                'commission_cash' => $account_info['commission_cash'] -$info['money'],
+                'commission_promoter' => $account_info['commission_promoter'] -$info['money'],
+           ]);
+       }
 
-        // 股东分红计算
-//        $res = $commissionCalculate->orderPartnerCommission();
-//        exit();
-//        $res = $commissionCalculate->getPartnerParents(11);
-        dump($commissionCalculate);
     }
 
     public function userIsParent()

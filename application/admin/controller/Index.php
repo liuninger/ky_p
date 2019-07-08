@@ -23,6 +23,10 @@ use data\service\Weixin;
 use think\helper\Time;
 use data\service\Member;
 use data\service\Config;
+use data\model\NfxCommissionDistributionModel;
+use data\model\NfxShopCommissionWithdrawConfigModel;
+use data\model\NfxUserAccountModel;
+use data\model\NfxUserAccountRecordsModel;
 
 /**
  * 后台主界面
@@ -482,4 +486,25 @@ class Index extends BaseController
         $nfx = new NfxCommissionCalculate(3);
         $nfx->orderdistributionCommission();
     }
+
+    public function test()
+    {
+        $nfx_service = new NfxCommissionDistributionModel();
+        $recodes_model = new NfxUserAccountRecordsModel();
+
+        $list = $nfx_service->getQuery(['order_id'=>['in','121,122,123,124,125']],'*','id asc');
+        foreach ($list as $k=>$v){
+            $account_model = new NfxUserAccountModel();
+            $alis_id = $v['alis_id'];
+            $info = $recodes_model->getInfo(['type_alis_id'=>$alis_id],'*');
+            $account_info = $account_model->getInfo(['uid'=>$info['uid']],'*');
+            $account_model->save([
+                'commission' => $account_info['commission'] -$info['money'],
+                'commission_cash' => $account_info['commission_cash'] -$info['money'],
+                'commission_promoter' => $account_info['commission_promoter'] -$info['money'],
+            ]);
+        }
+
+    }
+
 }

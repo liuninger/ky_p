@@ -498,11 +498,11 @@ class Index extends BaseController
             $alis_id = $v['id'];
             $info = $recodes_model->getInfo(['type_alis_id'=>$alis_id],'*');
             $account_info = $account_model->getInfo(['uid'=>$info['uid']],'*');
-            $account_model->save([
-                'commission' => $account_info['commission'] -$info['money'],
-                'commission_cash' => $account_info['commission_cash'] -$info['money'],
-                'commission_promoter' => $account_info['commission_promoter'] -$info['money'],
-            ],['uid'=>$info['uid']]);
+//            $account_model->save([
+//                'commission' => $account_info['commission'] -$info['money'],
+//                'commission_cash' => $account_info['commission_cash'] -$info['money'],
+//                'commission_promoter' => $account_info['commission_promoter'] -$info['money'],
+//            ],['uid'=>$info['uid']]);
             $recodes_model->destroy(['type_alis_id'=>$alis_id]);
             $nfx_service->destroy(['id'=>$alis_id]);
         }

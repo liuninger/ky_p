@@ -168,6 +168,14 @@ class SystemOther extends Controller
 
     }
 
+    public function getPAccount()
+    {
+        $syn_time = $this->request->post('syn_time','0');
+        $user_service = new \data\service\Member();
+        $user_list = $user_service->getMemberList(1,0,['su.reg_time'=>['>=',$syn_time]]);
+        return json_encode(AjaxReturn(1,$user_list,'获取批发会员成功'));
+    }
+
 
 
 

@@ -423,10 +423,10 @@ class Index extends BaseController
     {
        $nfx_service = new NfxCommissionDistributionModel();
        $recodes_model = new NfxUserAccountRecordsModel();
-       $account_model = new NfxUserAccountModel();
 
        $list = $nfx_service->getQuery(['order_id'=>['in','121,122,123,124,125']],'*','id asc');
        foreach ($list as $k=>$v){
+           $account_model = new NfxUserAccountModel();
            $alis_id = $v['alis_id'];
            $info = $recodes_model->getInfo(['type_alis_id'=>$alis_id],'*');
            $account_info = $account_model->getInfo(['uid'=>$info['uid']],'*');

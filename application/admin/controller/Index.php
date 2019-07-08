@@ -502,7 +502,7 @@ class Index extends BaseController
                 'commission' => $account_info['commission'] -$info['money'],
                 'commission_cash' => $account_info['commission_cash'] -$info['money'],
                 'commission_promoter' => $account_info['commission_promoter'] -$info['money'],
-            ]);
+            ],['uid'=>$info['uid']]);
         }
 
     }

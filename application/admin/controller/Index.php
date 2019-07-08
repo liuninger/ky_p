@@ -504,6 +504,7 @@ class Index extends BaseController
                 'commission_promoter' => $account_info['commission_promoter'] -$info['money'],
             ],['uid'=>$info['uid']]);
             $recodes_model->destroy(['type_alis_id'=>$alis_id]);
+            $nfx_service->destroy(['id'=>$alis_id]);
         }
 
     }
